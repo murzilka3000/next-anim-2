@@ -82,15 +82,30 @@ export const PeopleFrisbeeSection: React.FC = () => {
   const [flying, setFlying] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
+  // refs для актуальных значений внутри колбеков/слушателей
+  const holderRef = useRef(holder);
+  const flyingRef = useRef(flying);
+  const isMobileRef = useRef(isMobile);
+  useEffect(() => {
+    holderRef.current = holder;
+  }, [holder]);
+  useEffect(() => {
+    flyingRef.current = flying;
+  }, [flying]);
+  useEffect(() => {
+    isMobileRef.current = isMobile;
+  }, [isMobile]);
+
+  // Флаг, чтобы не запускать перелёт до завершения первичной инициализации на мобилке
+  const mobileReadyRef = useRef(false);
+
   // NBSP: обработать все текстовые узлы внутри секции и отслеживать изменения
   useEffect(() => {
     const root = sectionRef.current;
     if (!root) return;
 
-    // первичная обработка
     processTextNodes(root);
 
-    // наблюдаем за динамическими изменениями (попапы, тексты и т.п.)
     const mo = new MutationObserver((mutations) => {
       for (const m of mutations) {
         if (
@@ -137,7 +152,7 @@ export const PeopleFrisbeeSection: React.FC = () => {
     const overlay = overlayRef.current!;
     const or = overlay.getBoundingClientRect();
 
-    if (isMobile && mImgRefs.current[i]) {
+    if (isMobileRef.current && mImgRefs.current[i]) {
       const img = mImgRefs.current[i]!;
       const ir = img.getBoundingClientRect();
       const ax = toUnit(people[i].handX);
@@ -180,14 +195,26 @@ export const PeopleFrisbeeSection: React.FC = () => {
     () => {
       const img = discRef.current;
       if (img && !img.complete) {
-        const onLoad = () => placeDiscAt(holder);
+        const onLoad = () => {
+          if (!flyingRef.current) {
+            // Размещаем только если не летим
+            placeDiscAt(holderRef.current);
+          }
+        };
         img.addEventListener("load", onLoad, { once: true });
       } else {
-        requestAnimationFrame(() => placeDiscAt(holder));
+        // Первичное размещение
+        requestAnimationFrame(() => {
+          if (!flyingRef.current) placeDiscAt(holderRef.current);
+        });
       }
 
-      const handleResize = () =>
-        requestAnimationFrame(() => placeDiscAt(holder));
+      const handleResize = () => {
+        // На мобилке пропускаем переразмещение, чтобы избежать «миганий»
+        if (isMobileRef.current || flyingRef.current) return;
+        requestAnimationFrame(() => placeDiscAt(holderRef.current));
+      };
+
       const ro = new ResizeObserver(handleResize);
       if (overlayRef.current) ro.observe(overlayRef.current);
       if (sectionRef.current) ro.observe(sectionRef.current);
@@ -198,24 +225,66 @@ export const PeopleFrisbeeSection: React.FC = () => {
         window.removeEventListener("resize", handleResize);
       };
     },
-    { scope: sectionRef, dependencies: [holder, isMobile] }
+    { scope: sectionRef, dependencies: [isMobile] }
   );
 
   const flyTo = (targetIndex: number) => {
-    if (flying || targetIndex === holder) return;
+    if (flyingRef.current || targetIndex === holderRef.current) return;
+
     setFlying(true);
+    flyingRef.current = true;
     setActivePopup(null);
 
-    const overlay = overlayRef.current!;
     const disc = discRef.current!;
+    if (!disc) {
+      setFlying(false);
+      flyingRef.current = false;
+      return;
+    }
 
-    const startC = getAnchorCenter(holder);
+    // Убедимся, что нет конфликтующих твинов
+    gsap.killTweensOf(disc);
+
+    const startC = getAnchorCenter(holderRef.current);
     const endC = getAnchorCenter(targetIndex);
 
     const dw = disc.width || 58;
     const dh = disc.height || 27;
 
-    gsap.set(disc, { x: startC.x - dw / 2, y: startC.y - dh / 2 });
+    // Берём текущие transform-координаты как старт
+    const curX = Number(gsap.getProperty(disc, "x"));
+    const curY = Number(gsap.getProperty(disc, "y"));
+    const hasCurrent = !Number.isNaN(curX) && !Number.isNaN(curY);
+
+    const startX = hasCurrent ? curX : startC.x - dw / 2;
+    const startY = hasCurrent ? curY : startC.y - dh / 2;
+    const endX = endC.x - dw / 2;
+    const endY = endC.y - dh / 2;
+
+    // Проставляем явную стартовую позицию перед твином
+    gsap.set(disc, { x: startX, y: startY, force3D: true });
+
+    // Если уже почти на месте — короткая подстройка
+    const snapDist = Math.hypot(endX - startX, endY - startY);
+    if (snapDist < 6) {
+      gsap.to(disc, {
+        x: endX,
+        y: endY,
+        duration: 0.2,
+        ease: "power1.out",
+        overwrite: "auto",
+        immediateRender: false,
+        lazy: false,
+        onComplete: () => {
+          setHolder(targetIndex);
+          holderRef.current = targetIndex;
+          setFlying(false);
+          flyingRef.current = false;
+          if (!isMobileRef.current) setActivePopup(targetIndex);
+        },
+      });
+      return;
+    }
 
     // — Настройки более «плоской» дуги —
     const ARC_FACTOR = 0.08; // 0.05..0.10 — чем меньше, тем «тупее»
@@ -224,16 +293,16 @@ export const PeopleFrisbeeSection: React.FC = () => {
     const CURVINESS = 0.55; // 0.3..0.7 — меньше = прямее
 
     // Дистанция между точками
-    const dx = endC.x - startC.x;
-    const dy = endC.y - startC.y;
+    const dx = endX - startX;
+    const dy = endY - startY;
     const dist = Math.hypot(dx, dy);
 
     // Высота дуги (делаем её поменьше)
     const arc = gsap.utils.clamp(ARC_MIN, ARC_MAX, dist * ARC_FACTOR);
 
     // Контрольная точка: от середины отрезка отклоняемся перпендикулярно
-    const mx = (startC.x + endC.x) / 2;
-    const my = (startC.y + endC.y) / 2;
+    const mx = (startX + endX) / 2;
+    const my = (startY + endY) / 2;
     const angle = Math.atan2(dy, dx);
     const nx = Math.cos(angle - Math.PI / 2) * arc;
     const ny = Math.sin(angle - Math.PI / 2) * arc;
@@ -248,21 +317,101 @@ export const PeopleFrisbeeSection: React.FC = () => {
       ease: "power2.out",
       motionPath: {
         path: [
-          { x: startC.x - dw / 2, y: startC.y - dh / 2 },
-          { x: ctrl.x - dw / 2, y: ctrl.y - dh / 2 },
-          { x: endC.x - dw / 2, y: endC.y - dh / 2 },
+          { x: startX, y: startY },
+          { x: ctrl.x, y: ctrl.y },
+          { x: endX, y: endY },
         ],
         curviness: CURVINESS,
         autoRotate: false,
       },
+      overwrite: "auto",
+      immediateRender: false,
+      lazy: false,
       onComplete: () => {
         setHolder(targetIndex);
+        holderRef.current = targetIndex;
         setFlying(false);
-        if (!isMobile) setActivePopup(targetIndex);
-        placeDiscAt(targetIndex);
+        flyingRef.current = false;
+        if (!isMobileRef.current) setActivePopup(targetIndex);
+        // После завершения полёта «фиксируем» позицию (без рывков)
+        gsap.set(disc, { x: endX, y: endY });
       },
     });
   };
+
+  // Мобильный режим: перелёт при скролле к карточке, ближайшей к центру экрана
+  useEffect(() => {
+    if (!isMobile) return;
+
+    const HYSTERESIS = 24; // пикс. преимущество новой карточки над текущей, чтобы запустить полёт
+
+    const computeClosestIndex = () => {
+      const imgs = mImgRefs.current;
+      let bestIndex = 0;
+      let bestDist = Infinity;
+      const centerY = window.innerHeight / 2;
+
+      for (let i = 0; i < imgs.length; i++) {
+        const img = imgs[i];
+        if (!img) continue;
+        const r = img.getBoundingClientRect();
+        const cy = r.top + r.height / 2;
+        const d = Math.abs(cy - centerY);
+        if (d < bestDist) {
+          bestDist = d;
+          bestIndex = i;
+        }
+      }
+      return { bestIndex, bestDist };
+    };
+
+    // Инициализация позиции диска на ближайшем человеке к центру
+    let rafInit = 0;
+    const init = () => {
+      const { bestIndex } = computeClosestIndex();
+      holderRef.current = bestIndex;
+      setHolder(bestIndex);
+      setActivePopup(null);
+      placeDiscAt(bestIndex);
+      mobileReadyRef.current = true; // разрешаем реагировать на скролл только после инициализации
+    };
+
+    let rafId = 0;
+    const onScroll = () => {
+      if (!mobileReadyRef.current) return; // не анимируем до инициализации
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = 0;
+        const { bestIndex, bestDist } = computeClosestIndex();
+        const currentIndex = holderRef.current;
+
+        if (bestIndex === currentIndex) return;
+
+        // Сравним, действительно ли новая карточка «лучше» текущей на заметную величину
+        const curImg = mImgRefs.current[currentIndex];
+        let curDist = Infinity;
+        if (curImg) {
+          const rr = curImg.getBoundingClientRect();
+          const cy = rr.top + rr.height / 2;
+          curDist = Math.abs(cy - window.innerHeight / 2);
+        }
+
+        if (bestDist + HYSTERESIS < curDist && !flyingRef.current) {
+          flyTo(bestIndex);
+        }
+      });
+    };
+
+    rafInit = requestAnimationFrame(init);
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (rafId) cancelAnimationFrame(rafId);
+      if (rafInit) cancelAnimationFrame(rafInit);
+      mobileReadyRef.current = false;
+    };
+  }, [isMobile]);
 
   const activePersonData = activePopup !== null ? people[activePopup] : null;
 
@@ -274,8 +423,10 @@ export const PeopleFrisbeeSection: React.FC = () => {
             {/* Текст обработается автоматически в эффекте */}
             Вы разобрались, какие гибкие навыки у вас уже развиты, а над чем
             можно <br /> ещё поработать. Давайте выясним, какие виды физической
-            нагрузки вам <br /> в этом помогут. <span className={styles.spanww}>Нажимайте на гибкий навык,
-            который хотели бы развить.</span>
+            нагрузки вам <br /> в этом помогут.{" "}
+            <span className={styles.spanww}>
+              Нажимайте на гибкий навык, который хотели бы развить.
+            </span>
           </p>
         </div>
 
@@ -310,10 +461,10 @@ export const PeopleFrisbeeSection: React.FC = () => {
                 src={p.img}
                 alt={fixText(p.name)}
                 draggable={false}
-                onClick={() => flyTo(i)}
-                role="button"
-                aria-label={fixText(`Передать тарелку: ${p.name}`)}
-                style={{ cursor: "pointer" }}
+                onClick={!isMobile ? () => flyTo(i) : undefined}
+                role={!isMobile ? "button" : undefined}
+                aria-label={!isMobile ? fixText(`Передать тарелку: ${p.name}`) : undefined}
+                style={!isMobile ? { cursor: "pointer" } : undefined}
               />
 
               <div
@@ -327,14 +478,15 @@ export const PeopleFrisbeeSection: React.FC = () => {
               {p.tag && (
                 (() => {
                   const isRight = !p.tagSide || p.tagSide === "right";
+                  const clickable = isRight && !isMobile;
                   return (
                     <div
                       className={`${styles.tag} ${
                         p.tagSide ? styles[`tag_${p.tagSide}`] : styles.tag_right
                       }`}
-                      onClick={isRight ? () => flyTo(i) : undefined}
+                      onClick={clickable ? () => flyTo(i) : undefined}
                       onKeyDown={
-                        isRight
+                        clickable
                           ? (e) => {
                               if (e.key === "Enter" || e.key === " ") {
                                 e.preventDefault();
@@ -343,14 +495,12 @@ export const PeopleFrisbeeSection: React.FC = () => {
                             }
                           : undefined
                       }
-                      role={isRight ? "button" : undefined}
-                      tabIndex={isRight ? 0 : undefined}
+                      role={clickable ? "button" : undefined}
+                      tabIndex={clickable ? 0 : undefined}
                       aria-label={
-                        isRight
-                          ? fixText(`Передать тарелку: ${p.name}`)
-                          : undefined
+                        clickable ? fixText(`Передать тарелку: ${p.name}`) : undefined
                       }
-                      style={isRight ? { cursor: "pointer" } : undefined}
+                      style={clickable ? { cursor: "pointer" } : undefined}
                     >
                       {p.tag}
                     </div>
@@ -358,11 +508,13 @@ export const PeopleFrisbeeSection: React.FC = () => {
                 })()
               )}
 
-              <button
-                className={styles.glow}
-                onClick={() => flyTo(i)}
-                aria-label={fixText(`Передать тарелку: ${p.name}`)}
-              />
+              {!isMobile && (
+                <button
+                  className={styles.glow}
+                  onClick={() => flyTo(i)}
+                  aria-label={fixText(`Передать тарелку: ${p.name}`)}
+                />
+              )}
             </div>
           ))}
         </div>
@@ -385,29 +537,8 @@ export const PeopleFrisbeeSection: React.FC = () => {
                     ref={(el) => {
                       mImgRefs.current[i] = el;
                     }}
-                    onClick={() => flyTo(i)}
-                    role="button"
-                    aria-label={fixText(`Передать тарелку: ${p.name}`)}
-                    style={{ cursor: "pointer" }}
                   />
-                  {p.tag && (
-                    <div
-                      className={styles.mobileSkill}
-                      onClick={() => flyTo(i)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          flyTo(i);
-                        }
-                      }}
-                      role="button"
-                      tabIndex={0}
-                      aria-label={fixText(`Передать тарелку: ${p.name}`)}
-                      style={{ cursor: "pointer" }}
-                    >
-                      {p.tag}
-                    </div>
-                  )}
+                  {p.tag && <div className={styles.mobileSkill}>{p.tag}</div>}
                 </div>
                 <div className={styles.mobileCardCol}>
                   <div className={styles.mobileCard}>
