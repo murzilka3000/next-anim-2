@@ -1,0 +1,475 @@
+.section {
+  --bg: #ffeacf;
+  --muted: rgba(111, 86, 71, 0.6);
+  --card: #fff9ec;
+  --answer: #fff9ec;
+  --border: rgba(111, 86, 71, 0.35);
+  --shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+
+  // background: #FFEACF;
+  
+  color: var(--text);
+  padding: clamp(28px, 6vw, 72px) clamp(20px, 6vw, 72px);
+  position: relative;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+@media screen and (max-width: 767px) {
+  .section {
+    display: block;
+    height: auto;
+    padding-bottom: 0;
+  }
+}
+
+// @media screen and (max-width: 767px) {
+//   .section {
+//     background: #fce2c1;
+//   }
+// }
+
+/* Этап 1 */
+.intro {
+  margin: 0 auto;
+  min-height: 60vh;
+  display: grid;
+  align-content: center;
+  gap: clamp(8px, 1.6vw, 16px);
+  max-width: 1440px;
+  position: sticky;
+  top: 0;
+  width: 100%;
+}
+
+.subtitle_cont {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 200px;
+}
+
+.title {
+  font-family: var(--second-family);
+  font-weight: 500;
+  font-size: 80px;
+  line-height: 87%;
+  letter-spacing: -0.01em;
+  color: var(--title);
+  margin-bottom: 15px;
+}
+
+.subtitle {
+  font-family: var(--third-family);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 40px;
+  line-height: 90%;
+  letter-spacing: -0.01em;
+  color: var(--title-2);
+  margin-bottom: 15px;
+}
+
+.lead {
+  font-weight: 400;
+  font-size: 20px;
+  color: var(--text);
+  margin-bottom: 19px;
+}
+
+/* Этап 2 — desktop playground */
+.playground {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(16px, 4vw, 48px);
+  align-items: center;
+  margin-top: 0;
+  max-width: 1440px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}
+
+.left,
+.right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Draggable карточка мифа */
+.card {
+  width: clamp(260px, 32vw, 420px);
+  perspective: 1000px;
+  cursor: grab;
+  touch-action: none;
+  will-change: transform;
+}
+
+.card:active {
+  cursor: grabbing;
+}
+
+.cardInner {
+  height: 100%;
+  box-shadow: 0 0 20px 0 rgba(149, 127, 98, 0.15);
+  background: var(--text-light);
+  padding: 23px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  text-align: center;
+  min-height: 564px;
+}
+
+
+@media screen and (max-width: 767px) {
+  .cardInner  {
+    box-shadow: 0 0 20px 0 rgba(149, 127, 98, 0);
+  }
+}
+
+.cardLabel {
+  font-family: var(--second-family);
+  font-weight: 700;
+  font-size: 15px;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--title-2);
+}
+
+.cardText {
+  font-family: var(--third-family);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 107%;
+  letter-spacing: -0.01em;
+  text-align: center;
+  color: var(--title);
+}
+
+/* Зона дропа */
+.dropZone {
+  width: clamp(260px, 32vw, 420px);
+  position: relative;
+  display: grid;
+  place-items: center;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  background: transparent;
+  border: 2px dashed rgba(142, 112, 95, 0.4);
+  border-radius: 20px;
+  min-height: 564px;
+}
+
+.active {
+  border-color: rgba(111, 86, 71, 0.7);
+  background: rgba(255, 246, 234, 0.35);
+}
+
+.dropHint {
+  text-align: center;
+  max-width: 80%;
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.cursor {
+  margin-bottom: 28px;
+}
+
+/* Ответ эксперта */
+.answer {
+  background: var(--answer);
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  padding: clamp(18px, 2vw, 24px);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+.expertHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.avatar {
+  width: 142px;
+  height: 142px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 13px;
+  margin-top: 50px;
+}
+
+.avatarPlaceholder {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #e9d8c9;
+}
+
+.expertName {
+  font-family: var(--second-family);
+  font-weight: 700;
+  font-size: 15px;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--title-2);
+}
+
+.expertRole {
+  font-weight: 400;
+  font-size: 13px;
+  text-align: center;
+  color: var(--title-2);
+  margin-top: 5px;
+}
+
+.answerText {
+  margin-top: 24px;
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--text);
+}
+
+/* Адаптивы */
+@media screen and (max-width: 1149px) {
+  .playground {
+    gap: 100px;
+  }
+  .card,
+  .dropZone {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 967px) {
+  .title {
+    font-size: 60px;
+  }
+  .subtitle {
+    font-size: 36px;
+  }
+}
+
+@media screen and (max-width: 926px) {
+  .playground {
+    gap: 20px;
+  }
+}
+
+/* Мобильный слайдер (замена playground) */
+.mobileSlider {
+  display: none;
+}
+
+@media screen and (max-width: 811px) {
+  /* скрываем playground, показываем слайдер */
+  .playground {
+    display: none;
+  }
+  .mobileSlider {
+    display: block;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .section {
+    height: auto !important;
+  }
+
+ 
+
+  .swiper {
+    width: 100%;
+  }
+  .mobileSlide {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+  }
+
+  :global(.swiper-pagination-bullets) {
+    bottom: 8px;
+  }
+  :global(.swiper-pagination-bullet) {
+    background: var(--text-light) !important;
+    opacity: 1 !important;
+    width: 15px !important;
+    height: 15px !important;
+  }
+  :global(.swiper-pagination-bullet-active) {
+    background: var(--orange) !important;
+  }
+
+  .intro {
+    opacity: 1 !important;
+    min-height: auto;
+  }
+
+  .answerText {
+    text-align: left;
+  }
+
+  .mobilePagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    min-height: 20px;
+  }
+
+  .mobilePagination :global(.swiper-pagination-bullet) {
+    width: 8px;
+    height: 8px;
+    background: rgba(111, 86, 71, 0.35);
+    opacity: 1;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .mobilePagination :global(.swiper-pagination-bullet-active) {
+    background: var(--orange) !important;
+    transform: scale(1.1);
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .title {
+    font-size: 34px;
+  }
+
+  .subtitle {
+    font-size: 20px;
+  }
+
+  .lead {
+    font-size: 16px;
+    margin-bottom: 0;
+  }
+
+  .subtitle_cont {
+    padding-right: 100px;
+  }
+}
+
+@media screen and (max-width: 500) {
+  .subtitle_cont {
+    padding-right: 30px;
+  }
+
+  .cardText {
+    font-size: 24px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .section {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .lead br {
+    display: none;
+  }
+}
+
+.dropZone {
+  position: relative;
+}
+
+.dropHint {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  transform: translate(-50%, 50%);
+}
+
+.card {
+  position: relative;
+}
+
+.answer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.card:has(.dropHint) {
+  border: 1px dashed #8e705f66;
+  border-radius: 20px;
+}
+
+.abs_434 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  text-align: center;
+  margin-top: 5px;
+}
+
+.vtrvgtr {
+  font-weight: 400;
+  font-size: 13px;
+  text-align: center;
+  color: var(--text);
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+}
+
+@media screen and (max-width: 767px) {
+  .subtitle_cont {
+    padding: 0;
+  }
+}
+
+@media screen and (max-width: 890px) {
+  .subtitle_cont {
+    padding: 0;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .section  {
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 0;
+  }
+
+  .lead {
+    margin-bottom: 0;
+  }
+
+  .title {
+    margin-top: 50px;
+  }
+}
+
+
+@media screen and (max-width: 380px) {
+  .title {
+      font-size: 33px;
+  }
+}

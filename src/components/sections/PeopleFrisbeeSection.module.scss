@@ -1,0 +1,480 @@
+.section {
+  position: relative;
+  overflow-x: hidden; /* режем горизонталь */
+  // background: url("/images/trava.webp") center / cover no-repeat;
+}
+
+// @media screen and (max-width: 600px) {
+//   .section {
+//     background: url("/images/field-2.png") center / cover no-repeat;
+//   }
+// }
+
+/* заголовок сверху */
+.header {
+  display: grid;
+  place-items: center;
+  padding: 100px 0px 30px 0px;
+}
+
+.headerText {
+  margin: 0;
+  max-width: 567px;
+  text-align: center;
+  font-weight: 400;
+  font-size: 15px;
+  text-align: center;
+  color: var(--text-light);
+}
+
+/* Сцена: фон картинкой (трава/текстура) */
+.stage {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden; /* главное: не даём детям раздувать страницу по X */
+
+  max-width: 1440px;
+  margin: 0 auto;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+/* Отдельный слой для полёта тарелки */
+.overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.disc {
+  position: absolute;
+  width: 58px; /* размер мини-тарелки; подгони при необходимости */
+  height: auto;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.15));
+  will-change: transform;
+  transform: translateZ(0); /* стабильнее на мобилах */
+}
+
+/* Площадка с людьми */
+.board {
+  position: relative;
+  z-index: 1;
+  min-height: 800px;
+  overflow: hidden; /* на всякий: режем и тут */
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* Человек */
+.person {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  transform: translate(-50%, -100%) scale(var(--scale, 1));
+  transform-origin: 50% 100%;
+  width: clamp(140px, 14vw, 240px);
+  contain: layout;
+  overflow: visible;
+}
+
+.photo {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.12));
+  user-select: none;
+  -webkit-user-drag: none;
+  position: relative;
+  z-index: 2;
+}
+
+/* Якорь руки внутри блока человека (берёт координаты с .person) */
+.anchor {
+  position: absolute;
+  left: var(--ax, 50%);
+  top: var(--ay, 50%);
+  width: 2px;
+  height: 2px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* Пульсирующий светлячок — использует те же var(--ax/--ay) */
+.glow {
+  position: absolute;
+  left: var(--ax, 50%);
+  top: var(--ay, 50%);
+  transform: translate(-50%, -50%);
+  width: clamp(30px, 3vw, 36px);
+  height: clamp(30px, 3vw, 36px);
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    #ff6903 30%,
+    rgba(255, 105, 3, 0) 100%
+  );
+  animation: pulse 1.3s ease-in-out infinite;
+  box-shadow: 0 0 18px 6px rgba(255, 105, 3, 0.32);
+  z-index: 1;
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.12);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.85;
+  }
+}
+
+/* Подписи soft-скиллов */
+.tag {
+  position: absolute;
+  max-width: 100px;
+  font-family: var(--second-family);
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 120%;
+  text-transform: uppercase;
+  color: var(--text-light);
+}
+
+.tag_left {
+  left: -8px;
+  bottom: 16%;
+  transform: translate(-100%, 0);
+  text-align: right;
+}
+.tag_right {
+  right: -8px;
+  bottom: 0;
+  transform: translate(100%, 0);
+  text-align: left;
+}
+.tag_bottom {
+  left: 50%;
+  bottom: -8px;
+  transform: translate(-50%, 100%);
+  text-align: center;
+}
+
+/* --- НАЧАЛО ИЗМЕНЕНИЙ --- */
+
+/* Новый контейнер для позиционирования попапа НАД ВСЕМИ слоями */
+.popupContainer {
+  position: absolute;
+  /* Координаты берутся из inline-стилей, от данных активного человека */
+  left: var(--x);
+  top: var(--y);
+  /* Самый высокий z-index, чтобы перекрыть .overlay (z-index: 5) и всех людей */
+  z-index: 10;
+  /* Сам контейнер не должен ловить клики */
+  pointer-events: none;
+  /* Эти свойства нужны, чтобы дочерний .popup мог позиционироваться, не создавая размеров */
+  width: 0;
+  height: 0;
+  overflow: visible;
+}
+
+/* Попап */
+.popup {
+  position: absolute;
+  /* Координаты и трансформация остаются прежними, но теперь они относительно .popupContainer */
+  left: var(--popup-x, 50%);
+  top: var(--popup-y, -8%);
+  transform: translate(-50%, -100%);
+  pointer-events: auto;
+  width: 250px;
+  border-radius: 12px;
+  padding: 20px;
+  animation: popIn 0.28s ease-out both;
+  box-shadow: 0 0 20px 0 rgba(149, 127, 98, 0.15);
+  background: var(--text-light);
+}
+/* --- КОНЕЦ ИЗМЕНЕНИЙ --- */
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translate(
+      calc(-50% + var(--dx, 0)),
+      calc(-110% + var(--dy, -8%)) /* чуть выше на старте */
+    );
+  }
+  to {
+    opacity: 1;
+    transform: translate(
+      calc(-50% + var(--dx, 0)),
+      calc(-100% + var(--dy, -8%))
+    );
+  }
+}
+
+.popupTitle {
+  font-family: var(--second-family);
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 120%;
+  text-transform: uppercase;
+  color: var(--title-2);
+  margin-bottom: 11px;
+}
+
+.popupText {
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.popupClose {
+  position: absolute;
+  top: -16px;
+  right: -16px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* Адаптив под узкие экраны */
+@media (max-width: 980px) {
+  .person {
+    width: clamp(120px, 26vw, 220px);
+  }
+  .headerText {
+    font-size: 15px;
+  }
+}
+@media (max-width: 640px) {
+  .stage {
+    min-height: 120vh;
+  }
+  .board {
+    min-height: 120vh;
+  }
+  .person {
+    width: clamp(120px, 32vw, 200px);
+  }
+  .tag {
+    max-width: 120px;
+  }
+}
+
+@media screen and (max-width: 1010px) {
+  .tag_right {
+    text-align: left;
+    bottom: -28%;
+    right: 50%;
+    transform: translateX(50%);
+  }
+}
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+.mobileGrid {
+  display: none;
+}
+
+@media screen and (max-width: 871px) {
+  .overlay {
+    display: block;
+  }
+  .board {
+    display: none;
+  }
+
+  .mobileGrid {
+    display: grid;
+    row-gap: 28px;
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+
+  .mobileRow {
+    display: flex;
+    align-items: center;
+    column-gap: 16px;
+  }
+
+  .mobileGrid .mobileRow > :first-child {
+    flex: 1;
+  }
+
+  .mobileGrid .mobileRow > :last-child {
+    flex: 1.8;
+  }
+
+  .mobileRowReverse .mobileImgCol {
+    order: 2;
+  }
+
+  .mobileRowReverse .mobileCardCol {
+    order: 1;
+  }
+
+  .mobileImgCol,
+  .mobileCardCol {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mobileImg {
+    width: 100px;
+    height: auto;
+    display: block;
+  }
+
+  .mobileSkill {
+    margin-top: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 121%;
+    text-transform: uppercase;
+    color: var(--text-light);
+  }
+
+  .mobileGrid > :nth-child(2) .mobileSkill,
+  .mobileGrid > :nth-child(4) .mobileSkill {
+    text-align: right;
+  }
+
+  .mobileCard {
+    background: var(--text-light);
+    border-radius: 20px;
+    box-shadow: 0 0 20px 0 rgba(149, 127, 98, 0.15);
+    padding: 14px;
+  }
+
+  .mobileCardTitle {
+    font-family: var(--second-family);
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    color: var(--title-2);
+    margin-bottom: 8px;
+    text-align: left;
+  }
+
+  .mobileCardText {
+    font-weight: 400;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.4;
+    text-align: left;
+  }
+
+  .mobileImgCol {
+    flex-direction: column;
+  }
+
+  .headerText br {
+    display: none;
+  }
+
+  .popup {
+    display: none !important;
+    opacity: 0 !important;
+  }
+
+  .header {
+    padding-bottom: 42px;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .headerText br {
+    display: none;
+  }
+
+  .disc {
+    width: 30px;
+  }
+}
+
+.board > :first-child .tag_right {
+  right: 68px !important;
+}
+
+.board > :nth-child(2) .tag_right {
+  right: 28px !important;
+}
+
+.board > :nth-child(4) .tag_right {
+  right: 48px !important;
+}
+
+.board > :nth-child(3) .tag_right,
+.board > :last-child .tag_right {
+  right: -20px !important;
+}
+
+
+
+@media screen and (max-width: 871px) {
+   .mobileGrid > :first-child .mobileImg {
+    width: 106px!important;
+   }
+
+   .mobileGrid > :nth-child(2) .mobileImg {
+    width: 127px!important;
+   }
+
+     .mobileGrid > :nth-child(3) .mobileImg {
+    width: 136px!important;
+   }
+
+      .mobileGrid > :nth-child(4) .mobileImg {
+    width: 143px!important;
+   }
+
+      .mobileGrid > :nth-child(5) .mobileImg {
+    width: 127px!important;
+   }
+}
+
+@media screen and (max-width: 1000px) {
+  .headerText br {
+    display: none;
+  }
+}
+
+
+@media screen and (max-width: 500px) {
+  .header {
+    padding-top: 80px;
+  }
+}
+
+
+@media screen and (max-width: 767px) {
+  .spanww {
+    display: none;
+  }
+}

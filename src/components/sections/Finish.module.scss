@@ -1,0 +1,518 @@
+.finish {
+  // background-image: url("/images/trava.webp");
+  // background-position: center;
+  // background-repeat: no-repeat;
+  // background-size: cover;
+  padding-top: 50px;
+  padding-bottom: 50px;
+  padding-left: 50px;
+  padding-right: 50px;
+  position: relative;
+}
+
+@media screen and (max-width: 600px) {
+  .finish {
+    padding-bottom: 30px;
+  }
+}
+
+.finish__container {
+  position: relative;
+  overflow: hidden;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.finish__intro {
+  font-weight: 400;
+  font-size: 15px;
+  text-align: center;
+  color: var(--text-light);
+  margin-bottom: 53px;
+}
+
+.finish__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.finish__column {
+  display: flex;
+  gap: 100px;
+}
+
+.finish__text {
+  box-shadow: 0 0 20px 0 rgba(149, 127, 98, 0.15);
+  background: var(--text-light);
+  border-radius: 20px;
+  padding: 14px;
+  width: 250px;
+}
+
+.finish__name {
+  font-family: var(--third-family);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 100%;
+  letter-spacing: -0.01em;
+  text-transform: capitalize;
+  color: var(--title);
+  margin-bottom: 8px;
+}
+
+.finish__description {
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.finish__grid > :last-child {
+  justify-self: flex-end;
+  .finish__content {
+    img {
+      align-self: flex-end;
+    }
+  }
+}
+
+.finish__content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  img {
+    max-width: 100px;
+  }
+}
+
+.isClickable {
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.isClickable:hover {
+  transform: translateY(-2px);
+}
+.isClickable:active {
+  transform: translateY(0);
+}
+
+.flex_bottom {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  gap: 115px;
+}
+
+.finish__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  position: relative;
+  z-index: 10000;
+}
+
+.finish__footer p,
+.finish__footer a {
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 117%;
+  color: var(--text-light);
+}
+
+.finish__footer a {
+  text-decoration: underline;
+  text-decoration-skip-ink: none;
+}
+
+.tarelka {
+  position: absolute;
+  left: 50%;
+  bottom: 21px;
+  transform: translateX(calc(-50% + var(--idle-dx, 0px)))
+    rotate(var(--idle-rot, 0deg));
+  transform-origin: 50% 65%;
+  width: 325px;
+  height: auto;
+  z-index: 5;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.modal {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 6;
+}
+
+.modal__card {
+  background: url("/images/modal.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  color: var(--title);
+  border-radius: 18px;
+  padding: 24px 24px 20px;
+  text-align: center;
+  min-height: 373px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 800px; /* ширина модалки */
+}
+
+.modal__title {
+  font-family: var(--second-family);
+  font-weight: 500;
+  font-size: 36px;
+  line-height: 124%;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--title);
+}
+
+.modal__text {
+  font-family: var(--third-family);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 129%;
+  letter-spacing: -0.01em;
+  text-align: center;
+  color: var(--title-2);
+  margin-bottom: 21px;
+}
+
+.modal__btn {
+  font-family: var(--second-family);
+  font-weight: 600;
+  font-size: 18px;
+  text-align: center;
+  color: #fff;
+  box-shadow: 0 0 20px 0 rgba(255, 133, 50, 0.25);
+  border: 1px solid var(--orange);
+  border-radius: 15px;
+  background: var(--orange);
+  padding: 14px 30px;
+  text-decoration: none;
+  display: inline-block;
+}
+.modal__btn:active {
+  transform: translateY(0);
+}
+
+@media screen and (max-width: 1343px) {
+  .finish__column {
+    gap: 40px;
+  }
+}
+
+@media screen and (max-width: 1104px) {
+  .finish__content img {
+    display: none !important;
+  }
+
+  .finish__column {
+    flex-direction: column-reverse;
+  }
+
+  .finish__grid > :last-child {
+    flex-direction: column;
+  }
+
+  .finish__column img {
+    max-width: 200px;
+  }
+}
+
+@media screen and (max-width: 932px) {
+  .modal__card {
+    width: 650px;
+  }
+
+  .modal__title {
+    font-size: 28px;
+  }
+
+  .modal__text {
+    font-size: 21px;
+  }
+
+  // .modal__btn {
+  //   font-family: var(--second-family);
+  //   padding: 10px 20px;
+  //   font-size: 16px;
+  // }
+
+  .tarelka {
+    width: 280px;
+    bottom: 41px;
+  }
+}
+
+@media screen and (max-width: 756px) {
+  .modal__card {
+    width: 550px;
+  }
+
+  .modal__text {
+    font-size: 18px;
+  }
+
+  .finish__intro br {
+    display: none;
+  }
+
+  .finish {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+@media screen and (max-width: 655px) {
+  .modal__card {
+    width: 450px;
+  }
+
+  .modal__title {
+    font-size: 24px;
+  }
+
+  .modal__text {
+    margin-bottom: 10px;
+  }
+}
+
+@media screen and (max-width: 607px) {
+  .finish__footer p {
+    max-width: 200px;
+  }
+
+  .finish__name {
+    font-size: 18px;
+  }
+
+  .finish__text {
+    max-width: 189px;
+  }
+
+  .modal__card {
+    background-image: url("/images/bg-2.svg");
+  }
+}
+
+@media screen and (max-width: 551px) {
+  .modal__card {
+    width: 400px;
+  }
+
+  .finish__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .finish__grid > :nth-child(1) {
+    order: 2;
+  }
+
+  .finish__grid > :nth-child(2) {
+    order: 1;
+  }
+
+  .finish__grid > :first-child {
+    margin-top: -270px;
+  }
+
+  .tarelka {
+    width: 187px;
+    bottom: 51px;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  // .modal__btn {
+  //   padding: 13px 10px;
+  //   font-size: 18px;
+  // }
+
+  .modal__title {
+    font-size: 21px;
+  }
+
+  .modal__card {
+    width: 350px;
+  }
+
+  .isClickable {
+    max-width: 140px !important;
+  }
+
+  .finish__grid > :last-child > :last-child {
+    display: flex !important;
+    justify-content: flex-end;
+  }
+
+  .finish__grid > :first-child img {
+    max-width: 160px !important;
+  }
+}
+
+.finish__content img {
+  max-width: 58px;
+}
+
+.span12 {
+  position: absolute;
+  left: 50%;
+  bottom: -4px;
+  width: 82%;
+  max-width: 340px;
+  height: 26px;
+  transform: translateX(-50%) scale(1, 0.35);
+  border-radius: 50%;
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    rgba(0, 0, 0, 0.7) 0%,
+    rgba(0, 0, 0, 1) 100%
+  );
+  filter: blur(33px);
+  opacity: 0.45;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.stbr {
+  position: absolute;
+  left: 50%;
+  bottom: 40px;
+  width: 82%;
+  max-width: 340px;
+  height: 36px;
+  transform: translateX(-50%) scale(1, 0.35);
+  border-radius: 50%;
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) 100%
+  );
+  filter: blur(33px);
+  opacity: 0.45;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@media screen and (max-width: 1104px) {
+  .span12 {
+    left: 10%;
+    max-width: 140px;
+  }
+
+  .stbr {
+    left: 35%;
+    bottom: 0;
+  }
+}
+
+@media screen and (max-width: 551px) {
+  .span12 {
+    left: 10%;
+    max-width: 140px;
+  }
+
+  .stbr {
+    left: 50%;
+    bottom: 0;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  .span12 {
+    left: 10%;
+    max-width: 140px;
+  }
+
+  .stbr {
+    left: 70%;
+    bottom: 0;
+  }
+}
+
+/* Слой под светлячки поверх сетки (если используешь overlay для кнопок) */
+.glowLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none; /* клики только по .glow */
+  z-index: 20; /* выше игроков, ниже модалки */
+}
+
+/* Пульсирующий светлячок — как в PeopleFrisbeeSection */
+.glow {
+  position: absolute;
+  left: var(--ax, 50%);
+  top: var(--ay, 50%);
+  transform: translate(-50%, -50%);
+  width: clamp(30px, 3vw, 36px);
+  height: clamp(30px, 3vw, 36px);
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    #ff6903 30%,
+    rgba(255, 105, 3, 0) 100%
+  );
+  animation: pulse 1.3s ease-in-out infinite;
+  box-shadow: 0 0 18px 6px rgba(255, 105, 3, 0.32);
+  z-index: 1;
+  pointer-events: auto; /* чтобы клики проходили через overlay */
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.12);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.85;
+  }
+}
+
+/* Опционально: скрытие во время анимации броска */
+.glow_hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.isClickable {
+  position: relative;
+  z-index: 2000 !important;
+}
+
+.glowLayer button {
+  z-index: 1;
+}
+
+.modal {
+  z-index: 1000000000 !important;
+}
+
+.tarelka {
+  z-index: 1000000000000 !important;
+}
+
+@media screen and (max-width: 767px) {
+  .glowLayer > :last-child {
+    left: 259.4px!important;
+    top: 385.997px!important;
+  }
+}

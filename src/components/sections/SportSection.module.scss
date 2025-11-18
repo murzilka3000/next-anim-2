@@ -1,0 +1,317 @@
+.section {
+  --bg: #ffe8d1;
+  --cardBg: #fff6ea;
+  --cardShadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+
+  position: relative;
+  z-index: 0;
+  background: transparent;
+  color: var(--text);
+  padding-top: 200px;
+}
+
+
+
+
+@media screen and (max-width: 500px) {
+  .section {
+    padding-top: 100px;
+  }
+}
+
+.isPinned {
+  z-index: 50;
+}
+
+.inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: 40% 60%;
+  gap: clamp(16px, 4vw, 48px);
+  align-items: center;
+  padding: clamp(24px, 5vw, 64px);
+  padding-top: 0;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.6vw, 16px);
+  max-width: 520px;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.kicker {
+  font-family: var(--second-family);
+  font-weight: 500;
+  font-size: 100px;
+  letter-spacing: -0.01em;
+  color: var(--title);
+  margin-bottom: 15px;
+}
+
+.subhead {
+  font-family: var(--third-family);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 40px;
+  line-height: 90%;
+  letter-spacing: -0.01em;
+  text-align: right;
+  color: var(--title-2);
+  margin-bottom: 25px;
+}
+
+.lead {
+  font-weight: 400;
+  font-size: 20px;
+  color: var(--text);
+}
+
+.note {
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.right {
+  height: 564px;
+  display: flex;
+  align-items: center;
+}
+
+/* Десктоп: без маски, даём выходить контенту трека за рамки вьюпорта */
+.viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.track {
+  display: flex;
+  align-items: stretch;
+  gap: clamp(16px, 2vw, 28px);
+  height: 100%;
+  will-change: transform;
+  padding: clamp(8px, 1vw, 12px);
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.card {
+  flex: 0 0 auto;
+  width: 430px;
+  height: 100%;
+}
+
+.cardInner {
+  background: var(--cardBg);
+  border-radius: 18px;
+  height: 100%;
+  box-shadow: var(--cardShadow);
+  display: grid;
+  grid-template-rows: 1fr auto;
+  overflow: hidden;
+}
+
+.portrait {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #ffe9d7, #fbe0c8);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  display: flex;
+  align-items: flex-end;
+}
+
+.caption {
+  padding: 33px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.name {
+  font-family: var(--third-family);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 79%;
+  letter-spacing: -0.01em;
+  text-align: right;
+  color: var(--text-light);
+}
+
+.subtitle {
+  font-weight: 400;
+  font-size: 18px;
+  text-align: right;
+  color: var(--text-light);
+}
+
+@media (max-width: 900px) {
+  .inner {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .right {
+    height: clamp(280px, 56vh, 480px);
+  }
+
+  /* На планшетах можно оставить маску, если нужно «смягчение краёв» —
+     но по задаче достаточно моб. варианта ниже */
+}
+
+@media screen and (max-width: 1214px) {
+  .note br {
+    display: none;
+  }
+}
+
+.note_mob {
+  display: none;
+}
+
+/* Мобилка/узкий: нативный горизонтальный скролл трека */
+@media screen and (max-width: 1111px) {
+  .inner {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+  }
+
+  .note {
+    display: none;
+  }
+
+  .note_mob {
+    display: block;
+  }
+
+  .right {
+    width: 100%;
+  }
+
+  .viewport {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+
+    /* убираем маски/градиенты на мобилке */
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .track {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: clamp(16px, 2vw, 28px);
+    width: auto;
+    transform: none;
+    will-change: auto;
+    padding-left: 0;
+  }
+
+  .card {
+    flex: 0 0 350px;
+    width: 350px;
+    height: 100%;
+  }
+
+  .cardInner {
+    width: 100%;
+  }
+  .portrait {
+    width: 100%;
+  }
+
+  .left {
+    gap: 12px;
+    max-width: none;
+    height: auto;
+  }
+
+  /* скрыть скроллбар, оставить прокрутку */
+  .viewport {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/старый Edge */
+  }
+
+  .viewport::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .kicker {
+    font-size: 70px;
+  }
+
+  .subhead {
+    font-size: 26px;
+  }
+
+  .lead {
+    font-size: 16px;
+  }
+
+  .note {
+    font-size: 13px;
+  }
+
+  .inner {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+@media screen and (max-width: 380px) {
+  .card {
+    width: 300px;
+    flex: 0 0 300px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .card {
+    max-width: 270px;
+  }
+
+  .right {
+    height: 400px;
+  }
+
+  .caption {
+    padding: 23px;
+  }
+
+  .name  {
+    font-size: 22px;
+  }
+
+  .subtitle  {
+    font-size: 16px;
+  }
+}
+
+
+
+@media screen and (max-width: 1000px) {
+  .inner {
+    padding-bottom: 0;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .inner {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
