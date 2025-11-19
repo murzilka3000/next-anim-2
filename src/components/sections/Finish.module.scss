@@ -510,30 +510,24 @@
   z-index: 1000000000000 !important;
 }
 
-// @media screen and (max-width: 767px) {
-//   .glowLayer > :last-child {
-//     left: 259.4px!important;
-//     top: 385.997px!important;
-//   }
-// }
+
 @media screen and (max-width: 450px) {
   .glowLayer > :last-child {
     left: 300.4px!important;
-    top: 370px!important;
+    top: 385px!important;
   }
 }
 
 @media screen and (max-width: 445px) {
   .glowLayer > :last-child {
     left: 295.4px!important;
-    top: 370px!important;
+    top: 385px!important;
   }
 }
 
 @media screen and (max-width: 441px) {
   .glowLayer > :last-child {
     left: 290px!important;
-    top: 370px!important;
   }
 }
 
@@ -589,15 +583,15 @@
 
 @media screen and (max-width: 380px) {
   .glowLayer > :last-child {
-    left: 220.4px!important;
-    top: 385.997px!important;
+    left: 230.4px!important;
+    top: 400px!important;
   }
 }
 
-@media screen and (max-width: 365px) {
+@media screen and (max-width: 375px) {
   .glowLayer > :last-child {
-    left: 215px!important;
-    top: 385.997px!important;
+    left: 225px!important;
+    top: 400px!important;
   }
 }
 
