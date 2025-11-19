@@ -516,3 +516,10 @@
     top: 385.997px!important;
   }
 }
+
+@media screen and (max-width: 380px) {
+  .glowLayer > :last-child {
+    left: 220.4px!important;
+    top: 385.997px!important;
+  }
+}
