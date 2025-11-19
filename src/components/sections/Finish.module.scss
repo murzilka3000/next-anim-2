@@ -510,10 +510,30 @@
   z-index: 1000000000000 !important;
 }
 
-@media screen and (max-width: 767px) {
+// @media screen and (max-width: 767px) {
+//   .glowLayer > :last-child {
+//     left: 259.4px!important;
+//     top: 385.997px!important;
+//   }
+// }
+@media screen and (max-width: 450px) {
   .glowLayer > :last-child {
-    left: 259.4px!important;
-    top: 385.997px!important;
+    left: 300.4px!important;
+    top: 370px!important;
+  }
+}
+
+@media screen and (max-width: 445px) {
+  .glowLayer > :last-child {
+    left: 295.4px!important;
+    top: 370px!important;
+  }
+}
+
+@media screen and (max-width: 441px) {
+  .glowLayer > :last-child {
+    left: 290px!important;
+    top: 370px!important;
   }
 }
 
@@ -524,12 +544,41 @@
   }
 }
 
+@media screen and (max-width: 421px) {
+  .glowLayer > :last-child {
+    left: 270px!important;
+    top: 385.997px!important;
+  }
+}
+
 @media screen and (max-width: 414px) {
   .glowLayer > :last-child {
     left: 265.4px!important;
     top: 385.997px!important;
   }
 }
+
+@media screen and (max-width: 410px) {
+  .glowLayer > :last-child {
+    left: 260px!important;
+    top: 385.997px!important;
+  }
+}
+
+@media screen and (max-width: 405px) {
+  .glowLayer > :last-child {
+    left: 255px!important;
+    top: 385.997px!important;
+  }
+}
+
+@media screen and (max-width: 398px) {
+  .glowLayer > :last-child {
+    left: 250px!important;
+    top: 385.997px!important;
+  }
+}
+
 
 @media screen and (max-width: 390px) {
   .glowLayer > :last-child {
@@ -544,3 +593,11 @@
     top: 385.997px!important;
   }
 }
+
+@media screen and (max-width: 365px) {
+  .glowLayer > :last-child {
+    left: 215px!important;
+    top: 385.997px!important;
+  }
+}
+
